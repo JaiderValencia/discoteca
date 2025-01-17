@@ -14,8 +14,6 @@ export default {
         }
 
         const newBill: typeof Bill.$inferInsert = {
-            client_name: req.body.client_name,
-            client_id: req.body.client_id,
             note: req.body.note,
             total: req.body.total,
             table_id: req.body.table_id,
@@ -24,7 +22,10 @@ export default {
 
         await db.insert(Bill).values(newBill)
 
-        res.send('Created bill')
+        res.status(200).send({
+            statusCode: 200,
+            message: 'Bill created'
+        })
         return
     },
     read: async (req: Request, res: Response) => {
@@ -35,21 +36,59 @@ export default {
         })
 
         if (!bill) {
-            res.status(404).send('Bill not found')
+            res.status(404).send({
+                statusCode: 404,
+                message: 'Bill not found'
+            })
             return
         }
 
         res.send(bill)
         return
     },
-    readAll: async (_: Request, res: Response) => {
-        const bills = await db.select().from(Bill)
+    readAll: async (req: Request, res: Response) => {
+        const limit = Number(req.query.limit) || 10
+        const page = Number(req.query.page) || 1
+        const offset = limit * (page - 1)
 
-        res.send(bills)
-        return
+        const totalInDB = await db.$count(Bill)
+
+        const limitPage = Math.ceil(totalInDB / limit)
+
+        if (page > limitPage) {
+            res.status(404).send({
+                statusCode: 404,
+                message: 'Page not found'
+            })
+            return
+        }
+
+        const bills = await db.select().from(Bill).offset(offset).limit(limit)
+
+        const next = (page >= 1 && bills.length == limit && page < limitPage) ? `${req.protocol}://${req.get('host')}/api/bill/?page=${(page + 1)}&limit=${limit}` : null
+        const prev = (page > 1) ? `${req.protocol}://${req.get('host')}/api/bill/?page=${(page - 1)}&limit=${limit}` : null
+
+        res.status(200).send({
+            next,
+            prev,
+            page,
+            limit,
+            limitPage,
+            totalInDB,
+            data: bills
+        })
     },
-    update: (_: Request, res: Response) => {
-        res.send('Update bill')
+    update: async (req: Request, res: Response) => {
+        const id = Number(req.params.id)
+
+        const { note, total, table_id } = req.body
+
+        await db.update(Bill).set({ note, total, table_id }).where(eq(Bill.id, id))
+
+        res.status(200).send({
+            statusCode: 200,
+            message: 'Bill updated'
+        })
         return
     },
     delete: async (req: Request, res: Response) => {
