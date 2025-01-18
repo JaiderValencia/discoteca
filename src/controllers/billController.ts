@@ -3,21 +3,13 @@ import { Request, Response } from 'express'
 import db from '../db'
 import { eq } from 'drizzle-orm'
 import { Bill } from '../db/schema'
-import moment from 'moment-timezone'
 
 export default {
-    create: async (req: Request, res: Response) => {
-        const { TIME_ZONE } = process.env
-
-        if (!TIME_ZONE) {
-            throw new Error('TIME_ZONE is not defined')
-        }
-
+    create: async (req: Request, res: Response) => {        
         const newBill: typeof Bill.$inferInsert = {
             note: req.body.note,
             total: req.body.total,
-            table_id: req.body.table_id,
-            created_at: moment.tz(TIME_ZONE).toDate(),
+            table_id: req.body.table_id,            
         }
 
         await db.insert(Bill).values(newBill)

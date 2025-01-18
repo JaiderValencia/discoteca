@@ -1,4 +1,4 @@
-import { mysqlTable, text, real, datetime, int, boolean, varchar } from 'drizzle-orm/mysql-core'
+import { mysqlTable, text, real, timestamp, int, boolean, varchar } from 'drizzle-orm/mysql-core'
 
 export const Client_table = mysqlTable('client_table', {
     id: int('id').primaryKey().autoincrement(),
@@ -10,7 +10,7 @@ export const Bill = mysqlTable('bill', {
     id: int('id').primaryKey().autoincrement(),
     note: text('note'),
     total: real('total').notNull(),
-    created_at: datetime('created_at').notNull(),
+    created_at: timestamp('created_at').notNull().defaultNow(),
     table_id: int('table_id').notNull().references(() => Client_table.id, { onDelete: 'no action', onUpdate: 'cascade' }),
 })
 
