@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import db from '../db'
-import { body, validationResult } from 'express-validator'
+import { body } from 'express-validator'
 import { ProductOnBill } from '../utils/bill'
 import { count, eq } from 'drizzle-orm'
 import { Product, BillhasProducts } from '../db/schema'
@@ -59,16 +59,6 @@ export const hasFields = [
             return true
         })
 ]
-
-export const hasErrors = (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req)
-
-    if (!errors.isEmpty()) {
-        res.status(400).send(errors.mapped())
-        return
-    }
-    next()
-}
 
 export const calculateTotal = async (req: Request, _: Response, next: NextFunction) => {
     let total = 0

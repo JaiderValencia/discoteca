@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import productController from '../controllers/productController'
-import { hasErrors, hasFields, isExist } from '../middlewares/product'
+import { hasFields, isExist } from '../middlewares/product'
+import { hasErrors } from '../middlewares/global'
 const router = Router()
 
 router.post('/', hasFields, hasErrors, productController.create)

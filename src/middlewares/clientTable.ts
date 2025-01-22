@@ -1,4 +1,4 @@
-import { body, validationResult } from 'express-validator'
+import { body } from 'express-validator'
 import { Response, Request, NextFunction } from 'express'
 import db from '../db'
 import { Client_table } from '../db/schema'
@@ -10,16 +10,6 @@ export const hasFields = [
     body('occupied').notEmpty().withMessage('Must have occupied field').bail().isBoolean().withMessage('occupied field must be a boolean')
 ]
 
-export const hasErrors = (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req)
-
-    if (!errors.isEmpty()) {
-        res.status(400).json(errors.mapped())
-        return
-    }
-
-    next()
-}
 
 export const isActive = async (req: Request, res: Response, next: NextFunction) => {
     const id = Number(req.params?.id)

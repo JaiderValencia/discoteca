@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import db from '../db'
-import { body, validationResult } from 'express-validator'
+import { body } from 'express-validator'
 
 export const hasFields = [
     body('name')
@@ -23,17 +23,6 @@ export const hasFields = [
         .notEmpty().withMessage('Price field must not be empty').bail()
         .isNumeric().withMessage('Price field must be a number')
 ]
-
-export const hasErrors = (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req)
-
-    if (!errors.isEmpty()) {
-        res.status(400).send(errors.mapped())
-        return
-    }
-
-    next()
-}
 
 export const isExist = async (req: Request, res: Response, next: NextFunction) => {
     const id = Number(req.params?.id)

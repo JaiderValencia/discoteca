@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import tableController from '../controllers/clientTableController'
-import { hasErrors, hasFields, isActive, notRepeatRecord } from '../middlewares/clientTable'
+import { hasFields, isActive, notRepeatRecord } from '../middlewares/clientTable'
+import { hasErrors } from '../middlewares/global'
 
 const router = Router()
 

@@ -1,6 +1,7 @@
 import billController from '../controllers/billController'
 import { Router } from 'express'
-import { calculateTotal, checkProductsObjectDB, hasErrors, hasFields, isExist, updateProductsBill } from '../middlewares/bill'
+import { calculateTotal, checkProductsObjectDB, hasFields, isExist, updateProductsBill } from '../middlewares/bill'
+import { hasErrors } from '../middlewares/global'
 const router = Router()
 
 router.post('/', hasFields, hasErrors, calculateTotal, billController.create)
