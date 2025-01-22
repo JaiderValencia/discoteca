@@ -19,3 +19,9 @@ export const Product = mysqlTable('product', {
     name: varchar('name', { length: 100 }).notNull(),
     price: real('price').notNull()
 })
+
+export const BillhasProducts = mysqlTable('bill_has_products', {
+    bill_id: int('bill_id').notNull().references(() => Bill.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
+    product_id: int('product_id').notNull().references(() => Product.id, { onDelete: 'set null', onUpdate: 'cascade' }),
+    quantity: int('quantity').notNull().default(1)
+})

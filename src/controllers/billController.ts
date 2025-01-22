@@ -2,21 +2,32 @@ import 'dotenv/config'
 import { Request, Response } from 'express'
 import db from '../db'
 import { eq } from 'drizzle-orm'
-import { Bill } from '../db/schema'
+import { Bill, BillhasProducts, Product } from '../db/schema'
+import { ProductOnBill } from '../utils/bill'
 
 export default {
-    create: async (req: Request, res: Response) => {        
+    create: async (req: Request, res: Response) => {
         const newBill: typeof Bill.$inferInsert = {
             note: req.body.note,
             total: req.body.total,
-            table_id: req.body.table_id,            
+            table_id: req.body.table_id,
         }
 
-        await db.insert(Bill).values(newBill)
+        const billId = (await db.insert(Bill).values(newBill).$returningId())[0].id
+
+        let products: ProductOnBill[] = req.body.products
+
+        products = products.map(product => {
+            if (!product.delete) {
+                return { ...product, bill_id: billId }
+            }
+        }).filter(product => product !== undefined)
+
+        await db.insert(BillhasProducts).values(products)
 
         res.status(200).send({
             statusCode: 200,
-            message: 'Bill created'
+            message: 'Bill created',
         })
         return
     },
@@ -24,8 +35,10 @@ export default {
         const id = Number(req.params?.id)
 
         const bill = await db.query.Bill.findFirst({
-            where: (Bill, { eq }) => eq(Bill.id, id)
+            where: (Bill, { eq }) => eq(Bill.id, id),
         })
+
+        const products = await db.select({ product_id: BillhasProducts.product_id, product_name: Product.name, quantity: BillhasProducts.quantity }).from(BillhasProducts).where(eq(BillhasProducts.bill_id, id)).leftJoin(Product, eq(BillhasProducts.product_id, Product.id))
 
         if (!bill) {
             res.status(404).send({
@@ -35,7 +48,7 @@ export default {
             return
         }
 
-        res.send(bill)
+        res.status(200).send({ ...bill, products })
         return
     },
     readAll: async (req: Request, res: Response) => {
@@ -88,7 +101,10 @@ export default {
 
         await db.delete(Bill).where(eq(Bill.id, id))
 
-        res.send('Delete bill')
+        res.status(200).send({
+            statusCode: 200,
+            message: 'Bill deleted'
+        })
         return
     },
 }
