@@ -2,14 +2,9 @@
 import 'dotenv/config'
 import express from 'express'
 import routes from './routes'
-// import checkToken from './middlewares/checkToken'
 
 const app = express()
 const PORT = process.env.PORT || 3000
-
-
-//database
-
 
 //middlewares
 app.use(express.urlencoded({ extended: false }))
