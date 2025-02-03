@@ -40,7 +40,7 @@ export const hasFields = [
 
             for (const actualProduct of products) {
                 const productExist = (await db.select({ count: count() }).from(Product).where(eq(Product.id, actualProduct.product_id)))[0].count
-
+                
                 if (!productExist) {
                     return Promise.reject(`Product ID #${actualProduct.product_id} do not exist`)
                 }
