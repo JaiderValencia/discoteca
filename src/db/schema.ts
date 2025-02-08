@@ -11,6 +11,8 @@ export const Bill = mysqlTable('bill', {
     note: text('note'),
     total: real('total').notNull(),
     created_at: timestamp('created_at').notNull().defaultNow(),
+    paymentStatus: varchar('paymentStatus', { length: 50 }).notNull().default('unpaid'),
+    paymentID: text('paymentID'),
     table_id: int('table_id').notNull().references(() => Client_table.id, { onDelete: 'no action', onUpdate: 'cascade' }),
 })
 
@@ -22,6 +24,6 @@ export const Product = mysqlTable('product', {
 
 export const BillhasProducts = mysqlTable('bill_has_products', {
     bill_id: int('bill_id').notNull().references(() => Bill.id, { onDelete: 'cascade', onUpdate: 'cascade' }).notNull(),
-    product_id: int('product_id').notNull().references(() => Product.id, { onDelete: 'set null', onUpdate: 'cascade' }).notNull(),
+    product_id: int('product_id').notNull().references(() => Product.id, { onDelete: 'no action', onUpdate: 'cascade' }).notNull(),
     quantity: int('quantity').notNull().default(1)
 })
