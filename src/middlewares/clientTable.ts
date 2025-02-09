@@ -10,7 +10,6 @@ export const hasFields = [
     body('occupied').notEmpty().withMessage('Must have occupied field').bail().isBoolean().withMessage('occupied field must be a boolean')
 ]
 
-
 export const isActive = async (req: Request, res: Response, next: NextFunction) => {
     const id = Number(req.params?.id)
 
@@ -21,7 +20,7 @@ export const isActive = async (req: Request, res: Response, next: NextFunction) 
     })
 
     if (!client_table) {
-        res.status(404).send('client table not found')
+        res.status(404).send({ statusCode: 404, message: 'client table not found' })
         return
     }
 
@@ -33,6 +32,7 @@ export const notRepeatRecord = async (req: Request, res: Response, next: NextFun
 
     if (!id) {
         next()
+        return
     }
 
     const client_table = await db.query.Client_table.findFirst({
@@ -42,17 +42,15 @@ export const notRepeatRecord = async (req: Request, res: Response, next: NextFun
     })
 
     if (client_table?.active) {
-        res.status(200).send('client table is already active')
+        res.status(200).send({ statusCode: 200, message: 'client table is already active' })
 
         return
 
-    } else {
-
-        await db.update(Client_table).set({ active: true }).where(eq(Client_table.id, id))
-
-        res.status(200).send('client table reactivated')
-
-        return
     }
 
+    await db.update(Client_table).set({ active: true }).where(eq(Client_table.id, id))
+
+    res.status(200).send({ statusCode: 200, message: 'client table reactivated' })
+
+    return
 }

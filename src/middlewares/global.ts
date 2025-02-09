@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { validationResult } from 'express-validator'
+import { validationResult, param } from 'express-validator'
 
 export const hasErrors = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req)
@@ -10,3 +10,7 @@ export const hasErrors = (req: Request, res: Response, next: NextFunction) => {
     }
     next()
 }
+
+export const hasParamId = [
+    param('id').notEmpty().withMessage('Must have ID param').bail().isNumeric().withMessage('ID param must be a number')
+]

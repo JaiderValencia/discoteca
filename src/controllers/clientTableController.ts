@@ -16,8 +16,7 @@ export default {
         res.status(200).send({
             statusCode: 200,
             message: 'Client table created'
-        })
-        return
+        })        
     },
     read: async (req: Request, res: Response) => {
         const id = Number(req.params?.id)
@@ -77,7 +76,7 @@ export default {
     update: async (req: Request, res: Response) => {
         const { id, active, occupied } = req.body
 
-        await db.update(Client_table).set({ id, active, occupied })
+        await db.update(Client_table).set({ id, active, occupied }).where(eq(Client_table.id, Number(req.params.id)))
 
         res.status(200).send({
             statusCode: 200,
