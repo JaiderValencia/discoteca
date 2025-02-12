@@ -28,8 +28,7 @@ export default {
         res.status(200).send({
             statusCode: 200,
             message: 'Bill created',
-        })
-        return
+        })        
     },
     read: async (req: Request, res: Response) => {
         const id = Number(req.params?.id)

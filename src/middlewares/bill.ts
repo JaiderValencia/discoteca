@@ -40,17 +40,21 @@ export const hasFields = [
 
             for (const actualProduct of products) {
                 const productExist = (await db.select({ count: count() }).from(Product).where(eq(Product.id, actualProduct.product_id)))[0].count
-                
+
                 if (!productExist) {
                     return Promise.reject(`Product ID #${actualProduct.product_id} do not exist`)
                 }
 
-                if (actualProduct.quantity < 1) {
-                    return Promise.reject(`The quantity of the Product ID #${actualProduct.quantity} must be 1 or superior`)
+                if (actualProduct.quantity < 1 || !Number(actualProduct.quantity)) {
+                    return Promise.reject(`The quantity of the Product ID #${actualProduct.product_id} must be 1 or superior`)
                 }
 
                 if (seenIds.has(actualProduct.product_id)) {
                     return Promise.reject(`The products field must have one object per product`)
+                }
+
+                if (actualProduct.delete != true && actualProduct.delete != false) {
+                    return Promise.reject(`The delete field of the Product ID #${actualProduct.product_id} must be a boolean`)
                 }
 
                 seenIds.add(actualProduct.product_id)
