@@ -7,7 +7,7 @@ const router = Router()
 router.post('/', hasFields, hasErrors, calculateTotal, billController.create)
 router.get('/', billController.readAll)
 router.get('/:id', hasParamId, hasErrors, billController.read)
-router.put('/:id', isExist, hasFields, hasErrors, checkProductsObjectDB, calculateTotal, updateProductsBill, billController.update)
-router.delete('/:id', isExist, billController.delete)
+router.put('/:id', hasParamId, hasFields, hasErrors, isExist, checkProductsObjectDB, calculateTotal, updateProductsBill, billController.update)
+router.delete('/:id', hasParamId, hasErrors, isExist, billController.delete)
 
 export default router
