@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { Product } from '../db/schema'
+import { Product, ProductCategory } from '../db/schema'
 import { eq } from 'drizzle-orm'
 import db from '../db'
 
@@ -7,7 +7,8 @@ export default {
     create: async (req: Request, res: Response) => {
         const newProduct: typeof Product.$inferInsert = {
             name: req.body.name,
-            price: req.body.price
+            price: req.body.price,
+            category_id: req.body.category_id
         }
 
         await db.insert(Product).values(newProduct)
@@ -17,33 +18,20 @@ export default {
             message: 'Product created'
         })
     },
-    readById: async (req: Request, res: Response) => {
+    readOne: async (req: Request, res: Response) => {
         const id = Number(req.params.id)
 
-        const product = await db.query.Product.findFirst({
-            where: ({ id: ProductId }, { eq }) => (
-                eq(ProductId, id)
-            )
-        })
-
-        if (!product) {
-            res.status(404).send({
-                statusCode: 404,
-                message: 'Product not found'
+        const product = (
+            await db.select({
+                id: Product.id,
+                name: Product.name,
+                price: Product.price,
+                category: ProductCategory.name
             })
-            return
-        }
-
-        res.status(200).send(product)
-    },
-    readByName: async (req: Request, res: Response) => {
-        const name = String(req.query.name)
-
-        const product = await db.query.Product.findFirst({
-            where: ({ name: productName }, { eq }) => (
-                eq(productName, name)
-            )
-        })
+                .from(Product)
+                .where(eq(Product.id, id))
+                .leftJoin(ProductCategory, eq(Product.category_id, ProductCategory.id))
+        )[0]
 
         if (!product) {
             res.status(404).send({
@@ -72,7 +60,12 @@ export default {
             return
         }
 
-        const products = await db.select().from(Product).offset(offset).limit(limit)
+        const products = await db.select({
+            id: Product.id,
+            name: Product.name,
+            price: Product.price,
+            category: ProductCategory.name
+        }).from(Product).leftJoin(ProductCategory, eq(Product.category_id, ProductCategory.id)).offset(offset).limit(limit)
 
         const next = (page >= 1 && products.length == limit && page < limitPage) ? `${req.protocol}://${req.get('host')}/api/product/?page=${(page + 1)}&limit=${limit}` : null
         const prev = (page > 1) ? `${req.protocol}://${req.get('host')}/api/product/?page=${(page - 1)}&limit=${limit}` : null

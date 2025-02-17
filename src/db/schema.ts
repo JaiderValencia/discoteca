@@ -16,10 +16,16 @@ export const Bill = mysqlTable('bill', {
     table_id: int('table_id').notNull().references(() => Client_table.id, { onDelete: 'no action', onUpdate: 'cascade' }),
 })
 
+export const ProductCategory = mysqlTable('product_category', {
+    id: int('id').primaryKey().autoincrement().notNull(),
+    name: varchar('name', { length: 100 }).notNull(),
+})
+
 export const Product = mysqlTable('product', {
     id: int('id').primaryKey().autoincrement().notNull(),
     name: varchar('name', { length: 100 }).notNull(),
     price: real('price').notNull(),
+    category_id: int('category_id').references(() => ProductCategory.id, { onDelete: 'set null', onUpdate: 'cascade' }),
 })
 
 export const BillhasProducts = mysqlTable('bill_has_products', {

@@ -8,6 +8,13 @@
       "when": 1738892908337,
       "tag": "0000_aberrant_mad_thinker",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1739753751724,
+      "tag": "0001_pale_nick_fury",
+      "breakpoints": true
     }
   ]
 }

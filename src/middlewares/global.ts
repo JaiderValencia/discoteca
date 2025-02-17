@@ -12,5 +12,7 @@ export const hasErrors = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export const hasParamId = [
-    param('id').notEmpty().withMessage('Must have ID param').bail().isNumeric().withMessage('ID param must be a number')
+    param('id')
+        .notEmpty().withMessage('Must have ID param').bail()
+        .isNumeric().withMessage('ID param must be a number')
 ]
